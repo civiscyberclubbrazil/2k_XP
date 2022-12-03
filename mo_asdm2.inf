@@ -1,0 +1,141 @@
+;*****************************************************************************
+;
+; Name:  mo_asdm2.inf
+;
+; Function:
+;	Install the Motorola 1xEV-DO Handset Diagnostic Serial Port Drivers (WDM) on Win2000
+;
+; Copyright (c) 1997-2003 MCCI
+;
+; MCCI is a registered trademark of Moore Computer Consultants, Inc
+;
+; NOTICE: This software is licensed, not sold.  Any modification of this
+; inf file to change the reference to an operating system or to change the
+; reference to a device is not permitted unless authorized in writing by
+; Moore Computer Consultants, Inc.
+;
+;*****************************************************************************
+
+[Version]
+signature="$WINDOWS NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%Provider%
+DriverVer=12/11/2003, 4.18.0.2700
+;CatalogFile=mo_aserd.cat
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+[SourceDisksNames]
+; diskid = description[, [tagfile] [, <unused>, subdir]]
+1=%DiskString%,"mo_aserd.sys",,
+
+[SourceDisksFiles]
+; filename = diskid[,[ subdir][, size]]
+mo_aserd.sys = 1
+mo_acmnt.sys = 1
+
+;-----------------------------------------------------------------------------
+; Specify target paths...
+;-----------------------------------------------------------------------------
+
+[DestinationDirs]
+DefaultDestDir = 12                    ; system32\drivers
+
+;-----------------------------------------------------------------------------
+; Table of Contents
+;-----------------------------------------------------------------------------
+[Manufacturer]
+%Motorola%=Motorola
+
+;-----------------------------------------------------------------------------
+; Device-by-device entries
+;-----------------------------------------------------------------------------
+[Motorola]
+%Motorola.Comm.Desc% = Motorola.Install, USB\VID_22B8&PID_6631&MI_02&OS_NT
+%Motorola.Comm.Desc% = Motorola.Install, USB\VID_22B8&PID_2842&MI_02&OS_NT
+
+;-----------------------------------------------------------------------------
+; Installation instructions
+;-----------------------------------------------------------------------------
+
+[Motorola.Install.nt]
+AddReg		= Motorola.AddReg,Motorola.NT.AddReg
+CopyFiles	= CopyFiles, CopyFiles.Win2K
+
+
+;-----------------------------------------------------------------------------
+;  Registry
+;-----------------------------------------------------------------------------
+
+; common registry entries 
+[Motorola.AddReg]
+HKR,,NTMPDriver,,mo_aserd.sys
+
+; only for NT...
+[Motorola.NT.AddReg]
+HKR,,PortSubClass,1,01
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+;-----------------------------------------------------------------------------
+;  Copy lists
+;-----------------------------------------------------------------------------
+[CopyFiles]
+
+[CopyFiles.Win2K]
+mo_aserd.sys
+mo_acm.sys,mo_acmnt.sys
+mo_acmnt.sys
+
+
+;-----------------------------------------------------------------------------
+;  NT Services installation
+;-----------------------------------------------------------------------------
+
+[Motorola.Install.NT.Services]
+AddService = mo_aserd, 0x00000002, Motorola.Install.AddService
+
+
+[Motorola.Install.AddService]
+DisplayName	= %Motorola.Service.Name%
+Description	= %Motorola.Service.Desc%
+ServiceType	= 1			;%SERVICE_KERNEL_DRIVER%
+StartType	= 3			;%SERVICE_DEMAND_START%
+ErrorControl	= 1			;%SERVICE_ERROR_NORMAL%	
+ServiceBinary	= %12%\mo_aserd.sys
+
+
+
+;-----------------------------------------------------------------------------
+; STRINGS
+;-----------------------------------------------------------------------------
+[Strings]
+
+;<<localize the following>>
+
+;BEGIN ENG - US English Strings
+
+Provider = "Motorola Korea, Inc."
+Motorola = "Motorola Korea, Inc."
+DiskString = "Motorola 1xEV-DO Handset Diagnostic Serial Port Drivers installation disk"
+
+Motorola.Comm.Desc = "Motorola 1xEV-DO Handset Diagnostic Serial Port Drivers (WDM)"
+Motorola.Service.Name = "Motorola 1xEV-DO Handset Diagnostic Serial Port Drivers (WDM)"
+Motorola.Service.Desc = "Motorola 1xEV-DO Handset Diagnostic Serial Port Drivers (WDM)"
+
+
+CustomerDataPath = "Motorola 1xEV-DO Handset"
+DriverSet = "Motorola 1xEV-DO Handset Software"
+UninstallFile = "MO_AUninstall.exe"
+McciOptions = "Uninstallable"
+
+
+;END ENG - US English Strings
+
+;-----------------------------------------------------------------------------
+; The following are symbolic constants which don't change per locale.
+;-----------------------------------------------------------------------------
+
+
+;*** end of file ***

@@ -1,0 +1,172 @@
+;*****************************************************************************
+;
+; mo_abus.inf   -- Install the Motorola USB Composite Device drivers
+;
+; Copyright (c) 1997-2003 by MCCI 
+;
+; $Id: cdcbus.inf,v 1.10 2003/07/29 02:07:57 greg Exp $
+;
+; MCCI is a registered trademark of Moore Computer Consultants, Inc.
+;
+; NOTICE: This software is licensed, not sold.  Any modification of this
+; inf file to change the reference to an operating system or to change the
+; reference to a device is not permitted unless authorized in writing by
+; Moore Computer Consultants, Inc..
+;
+;*****************************************************************************
+
+[version]
+signature="$CHICAGO$"
+Class=USB
+ClassGuid={36FC9E60-c465-11cf-8056-444553540000}
+Provider=%Provider%
+DriverVer=12/11/2003, 4.18.0.2700
+;CatalogFile=mo_abus.cat
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+;-----------------------------------------------------------------------------
+; Specify target paths...
+;-----------------------------------------------------------------------------
+[DestinationDirs]
+DefaultDestDir                  = 11                    ; LDID_SYS
+MotorolaWdm.W95.CopyFiles       = 11                    ; LDID_SYS
+MotorolaWdm.NT.CopyFiles        = 12                    ; system32\drivers
+PropPages.CopyFiles             = 11                    ; system
+
+;-----------------------------------------------------------------------------
+; Specify the install disks.  A bit unwieldy during development.
+;-----------------------------------------------------------------------------
+[SourceDisksNames]
+; diskid = description[, [tagfile] [, <unused>, subdir]]
+1=%DiskString%,"mo_abus.sys",,
+
+[SourceDisksFiles]
+; filename = diskid[, [subdir] [, size]]
+mo_abus.sys = 1
+mo_awh95.sys = 1
+mo_awhnt.sys = 1
+
+;-----------------------------------------------------------------------------
+; Table of Contents:  manufacturer, then devices.
+;-----------------------------------------------------------------------------
+[Manufacturer]
+%Motorola%=Motorola
+
+;-----------------------------------------------------------------------------
+; The devices
+;-----------------------------------------------------------------------------
+[Motorola]
+%Motorola.CdcBus.Desc% = MotorolaWdm.Install, USB\VID_22B8&PID_6631
+%Motorola.CdcBus.Desc% = MotorolaWdm.Install, USB\VID_22B8&PID_2842
+
+;-----------------------------------------------------------------------------
+; How to install them:  On W9x, the [section] name is used directly.
+; On NT, the system first tries [section.NT], then [section].
+;-----------------------------------------------------------------------------
+
+;-----------------------------------------------------------------------------
+; Diagnostics Files CopyFiles List Section
+;-----------------------------------------------------------------------------
+[Motorola.CopyFiles]
+
+;-----------------------------------------------------------------------------
+; XXX when we have a property page DLL, add it to the following section.
+;-----------------------------------------------------------------------------
+[PropPages.CopyFiles]
+
+;-----------------------------------------------------------------------------
+;       How to install the WDM driver on W95/W98
+;-----------------------------------------------------------------------------
+[MotorolaWdm.Install]
+DriverVer=12/11/2003, 4.18.0.2700
+CopyFiles       = MotorolaWdm.W95.CopyFiles, Motorola.CopyFiles, PropPages.CopyFiles
+AddReg          = MotorolaWdm.AddReg, MotorolaWdm.W95.AddReg
+
+;-----------------------------------------------------------------------------
+;       How to install the WDM driver on NT
+;-----------------------------------------------------------------------------
+[MotorolaWdm.Install.NT]
+DriverVer=12/11/2003, 4.18.0.2700
+CopyFiles       = MotorolaWdm.NT.CopyFiles
+AddReg          = MotorolaWdm.AddReg, MotorolaWdm.NT.AddReg
+
+;-----------------------------------------------------------------------------
+;       How to start the WDM driver on NT
+;-----------------------------------------------------------------------------
+[MotorolaWdm.Install.NT.Services]
+AddService      = mo_abus, 2, MotorolaWdm.AddService
+
+[MotorolaWdm.AddService]
+DisplayName             = %Motorola.Service.Desc%
+ServiceType             = 1     ; SERVICE_KERNEL_DRIVER
+StartType               = 3     ; SERVICE_DEMAND_START
+ErrorControl            = 1     ; SERVICE_ERROR_NORMAL
+ServiceBinary           = %12%\mo_abus.sys
+LoadOrderGroup          = Base
+
+;-----------------------------------------------------------------------------
+;       WDM registry entries (all platforms)
+;-----------------------------------------------------------------------------
+[MotorolaWdm.AddReg]
+
+
+;-----------------------------------------------------------------------------
+;       WDM registry entries (W95/98) (including how to start the driver)
+;-----------------------------------------------------------------------------
+[MotorolaWdm.W95.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,mo_abus.sys
+
+;-----------------------------------------------------------------------------
+;       WDM registry entries (NT only)
+;-----------------------------------------------------------------------------
+[MotorolaWdm.NT.AddReg]
+
+;-----------------------------------------------------------------------------
+;       The WDM copy list for Win95 -- different because things go in
+;       different places.  Also, we probably need to rename drivers 
+;       during the install.
+;-----------------------------------------------------------------------------
+[MotorolaWdm.W95.CopyFiles]
+mo_abus.sys
+mo_awh.sys,mo_awh95.sys
+mo_awh95.sys
+mo_awhnt.sys
+
+;-----------------------------------------------------------------------------
+;       The WDM copy list for NT -- different because things go in
+;       different places.
+;-----------------------------------------------------------------------------
+[MotorolaWdm.NT.CopyFiles]
+mo_abus.sys
+mo_awh.sys,mo_awhnt.sys
+mo_awhnt.sys
+
+;****************************************************************************
+; Localizable Strings
+;****************************************************************************
+[strings]
+
+;BEGIN ENG - US English Strings
+Provider = "Motorola Korea, Inc."
+Motorola = "Motorola Korea, Inc."
+DiskString = "Motorola USB Composite Device Installation disk"
+
+Motorola.CdcBus.Desc = "Motorola USB Composite Device"
+Motorola.Service.Desc = "Motorola USB Composite Device driver (WDM)"
+
+CustomerDataPath = "Motorola 1xEV-DO Handset"
+DriverSet = "Motorola 1xEV-DO Handset Software"
+UninstallFile = "MO_AUninstall.exe"
+McciOptions = "Uninstallable"
+
+
+;END ENG - US English Strings
+
+;-----------------------------------------------------------------------------
+; Following are symbolic constants which don't change per locale.
+;-----------------------------------------------------------------------------
+
+;*** end of file ***
